@@ -17,6 +17,16 @@ function App() {
     setMarkers([...markers, marker]);
   };
 
+  const onClickMarker = (e) => {
+    const { lat, lng } = e.latLng;
+    const toDelete = { lat: lat(), lng: lng() };
+    setMarkers(
+      markers.filter((marker) => {
+        return !(marker.lat === toDelete.lat && marker.lng === toDelete.lng);
+      })
+    );
+  };
+
   return (
     <div className="App">
       {isLoaded ? (
@@ -27,7 +37,7 @@ function App() {
           zoom={4}
         >
           {markers.map(({ lat, lng }, i) => (
-            <MarkerF position={{ lat, lng }} key={i} />
+            <MarkerF position={{ lat, lng }} key={i} onClick={onClickMarker} />
           ))}
         </GoogleMap>
       ) : (
