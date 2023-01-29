@@ -19,6 +19,7 @@ function App() {
     googleMapsApiKey: MAPS_API_KEY,
   });
   const [markers, setMarkers] = useState([]);
+  const [center, setCenter] = useState({ lat: 39, lng: -95 })
 
   useEffect(() => {
     const q = query(collection(db, "markers"));
@@ -52,7 +53,8 @@ function App() {
         <GoogleMap
           mapContainerClassName="map-container"
           onClick={onClick}
-          center={{ lat: 39, lng: -95 }}
+          onTilesLoaded={() => setCenter(null)}
+          center={center}
           zoom={4}
         >
           {markers.map(({ lat, lng }, i) => (
