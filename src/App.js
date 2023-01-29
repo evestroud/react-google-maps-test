@@ -1,7 +1,14 @@
 /* global google */
 import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
 import { useEffect, useState } from "react";
-import { addDoc, query, collection, onSnapshot } from "firebase/firestore";
+import {
+  addDoc,
+  query,
+  collection,
+  onSnapshot,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "./firebase";
 import "./App.css";
 
@@ -29,18 +36,14 @@ function App() {
     const { lat, lng } = e.latLng;
     await addDoc(collection(db, "markers"), {
       lat: lat(),
-      lng: lng()
+      lng: lng(),
     });
   };
 
   const onClickMarker = (e) => {
-    const { lat, lng } = e.latLng;
-    const toDelete = { lat: lat(), lng: lng() };
-    setMarkers(
-      markers.filter((marker) => {
-        return !(marker.lat === toDelete.lat && marker.lng === toDelete.lng);
-      })
-    );
+    const [lat, lng] = [e.latLng.lat(), e.latLng.lng()];
+    const toDelete = markers.find((m) => m.lat === lat && m.lng === lng);
+    deleteDoc(doc(db, "markers", toDelete.id));
   };
 
   return (
