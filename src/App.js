@@ -1,6 +1,8 @@
 /* global google */
 import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { addDoc, query, collection, onSnapshot } from "firebase/firestore";
+import { db } from "./firebase";
 import "./App.css";
 
 const MAPS_API_KEY = `${process.env.REACT_APP_MAPS_API_KEY}`;
@@ -11,10 +13,24 @@ function App() {
   });
   const [markers, setMarkers] = useState([]);
 
-  const onClick = (e) => {
+  useEffect(() => {
+    const q = query(collection(db, "markers"));
+
+    const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
+      let markers = [];
+      QuerySnapshot.forEach((doc) => {
+        markers.push({ ...doc.data(), id: doc.id });
+      });
+      setMarkers(markers);
+    });
+  }, []);
+
+  const onClick = async (e) => {
     const { lat, lng } = e.latLng;
-    const marker = { lat: lat(), lng: lng() };
-    setMarkers([...markers, marker]);
+    await addDoc(collection(db, "markers"), {
+      lat: lat(),
+      lng: lng()
+    });
   };
 
   const onClickMarker = (e) => {
