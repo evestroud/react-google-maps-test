@@ -57,6 +57,11 @@ function App() {
       deleteDoc(doc(db, "markers", marker.id));
   }
 
+  const getCurrentLocation = () => {
+    navigator.geolocation.getCurrentPosition((res) => {
+      const [lat, lng] = [res.coords.latitude, res.coords.longitude];
+      addMarkerToDb(lat, lng);
+    });
   };
 
   return (
