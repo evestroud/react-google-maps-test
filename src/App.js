@@ -81,6 +81,9 @@ function App() {
       ) : (
         <h1>Loading...</h1>
       )}
+      <div className="controls">
+        <button onClick={getCurrentLocation}>Get my location</button>
+      </div>
     </div>
   );
 }
