@@ -1,4 +1,3 @@
-/* global google */
 import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
 import { useEffect, useState } from "react";
 import {
