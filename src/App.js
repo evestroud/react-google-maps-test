@@ -70,6 +70,10 @@ function App() {
     });
   };
 
+  const zoomToFit = () => {
+    //
+  }
+
   return (
     <div className="App">
       {isLoaded ? (
@@ -89,6 +93,7 @@ function App() {
       )}
       <div className="controls">
         <button onClick={getCurrentLocation}>Get my location</button>
+        <button onClick={zoomToFit}>Zoom to fit markers</button>
         <button onClick={deleteAllMarkers}>Clear markers</button>
       </div>
     </div>
