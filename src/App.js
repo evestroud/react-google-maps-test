@@ -53,8 +53,14 @@ function App() {
     deleteMarkerFromDb(toDelete);
   };
 
+  const deleteAllMarkers = () => {
+    for (let marker of markers) {
+      deleteMarkerFromDb(marker);
+    }
+  };
+
   function deleteMarkerFromDb(marker) {
-      deleteDoc(doc(db, "markers", marker.id));
+    deleteDoc(doc(db, "markers", marker.id));
   }
 
   const getCurrentLocation = () => {
@@ -83,6 +89,7 @@ function App() {
       )}
       <div className="controls">
         <button onClick={getCurrentLocation}>Get my location</button>
+        <button onClick={deleteAllMarkers}>Clear markers</button>
       </div>
     </div>
   );
