@@ -18,7 +18,7 @@ function App() {
     googleMapsApiKey: MAPS_API_KEY,
   });
   const [markers, setMarkers] = useState([]);
-  const [center, setCenter] = useState({ lat: 39, lng: -95 })
+  const [center, setCenter] = useState({ lat: 39, lng: -95 });
 
   useEffect(() => {
     const q = query(collection(db, "markers"));
@@ -32,13 +32,20 @@ function App() {
     });
   }, []);
 
-  const onClick = async (e) => {
+  const onClick = (e) => {
     const { lat, lng } = e.latLng;
-    await addDoc(collection(db, "markers"), {
-      lat: lat(),
-      lng: lng(),
-    });
+    addMarkerToDb(lat(), lng());
   };
+
+  function addMarkerToDb(lat, lng) {
+    const approxEquals = (x, y) => Math.abs(x - y) < 0.001;
+    // don't add a duplicate marker
+    if (
+      !markers.find((m) => approxEquals(m.lat, lat) && approxEquals(m.lng, lng))
+    ) {
+      addDoc(collection(db, "markers"), { lat, lng });
+    }
+  }
 
   const onClickMarker = (e) => {
     const [lat, lng] = [e.latLng.lat(), e.latLng.lng()];
