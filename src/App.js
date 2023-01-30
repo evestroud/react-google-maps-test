@@ -50,7 +50,13 @@ function App() {
   const onClickMarker = (e) => {
     const [lat, lng] = [e.latLng.lat(), e.latLng.lng()];
     const toDelete = markers.find((m) => m.lat === lat && m.lng === lng);
-    deleteDoc(doc(db, "markers", toDelete.id));
+    deleteMarkerFromDb(toDelete);
+  };
+
+  function deleteMarkerFromDb(marker) {
+      deleteDoc(doc(db, "markers", marker.id));
+  }
+
   };
 
   return (
