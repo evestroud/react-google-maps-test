@@ -1,5 +1,5 @@
 import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   addDoc,
   query,
@@ -19,6 +19,7 @@ function App() {
   });
   const [markers, setMarkers] = useState([]);
   const [center, setCenter] = useState({ lat: 39, lng: -95 });
+  const ref = useRef(null);
 
   useEffect(() => {
     const q = query(collection(db, "markers"));
@@ -71,8 +72,10 @@ function App() {
   };
 
   const zoomToFit = () => {
-    //
-  }
+    const bounds = new window.google.maps.LatLngBounds();
+    markers?.forEach(({ lat, lng }) => bounds.extend({ lat, lng }));
+    ref.current.fitBounds(bounds);
+  };
 
   return (
     <div className="App">
@@ -83,6 +86,7 @@ function App() {
           onTilesLoaded={() => setCenter(null)}
           center={center}
           zoom={4}
+          onLoad={(map) => ref.current = map}
         >
           {markers.map(({ lat, lng }, i) => (
             <MarkerF position={{ lat, lng }} key={i} onClick={onClickMarker} />
