@@ -73,9 +73,13 @@ function App() {
   };
 
   const zoomToFit = () => {
-    const bounds = new window.google.maps.LatLngBounds();
-    markers?.forEach(({ lat, lng }) => bounds.extend({ lat, lng }));
-    ref.current.fitBounds(bounds);
+    if (markers.length > 1) {
+      const bounds = new window.google.maps.LatLngBounds();
+      markers?.forEach(({ lat, lng }) => bounds.extend({ lat, lng }));
+      ref.current.fitBounds(bounds);
+    } else if (markers.length === 1) {
+      // TODO manually set center and zoom
+    }
   };
 
   const resetMap = () => {
