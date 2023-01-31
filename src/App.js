@@ -78,7 +78,10 @@ function App() {
       markers?.forEach(({ lat, lng }) => bounds.extend({ lat, lng }));
       ref.current.fitBounds(bounds);
     } else if (markers.length === 1) {
-      // TODO manually set center and zoom
+      setCenter(markers[0]);
+      setZoom(15);
+    } else {
+      resetMap();
     }
   };
 
