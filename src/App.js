@@ -19,6 +19,7 @@ function App() {
   });
   const [markers, setMarkers] = useState([]);
   const [center, setCenter] = useState({ lat: 39, lng: -95 });
+  const [zoom, setZoom] = useState(4);
   const ref = useRef(null);
 
   useEffect(() => {
@@ -77,16 +78,24 @@ function App() {
     ref.current.fitBounds(bounds);
   };
 
+  const resetMap = () => {
+    setCenter({ lat: 39, lng: -95 });
+    setZoom(4);
+  };
+
   return (
     <div className="App">
       {isLoaded ? (
         <GoogleMap
           mapContainerClassName="map-container"
           onClick={onClick}
-          onTilesLoaded={() => setCenter(null)}
+          onTilesLoaded={() => {
+            setCenter(null);
+            setZoom(null);
+          }}
           center={center}
-          zoom={4}
-          onLoad={(map) => ref.current = map}
+          zoom={zoom}
+          onLoad={(map) => (ref.current = map)}
         >
           {markers.map(({ lat, lng }, i) => (
             <MarkerF position={{ lat, lng }} key={i} onClick={onClickMarker} />
@@ -98,6 +107,7 @@ function App() {
       <div className="controls">
         <button onClick={getCurrentLocation}>Get my location</button>
         <button onClick={zoomToFit}>Zoom to fit markers</button>
+        <button onClick={resetMap}>Reset map view</button>
         <button onClick={deleteAllMarkers}>Clear markers</button>
       </div>
     </div>
