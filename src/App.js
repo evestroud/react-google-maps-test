@@ -19,7 +19,7 @@ function App() {
     googleMapsApiKey: MAPS_API_KEY,
   });
   const [markers, setMarkers] = useState([]);
-  const [center, setCenter] = useState({ lat: 39, lng: -95 })
+  const [center, setCenter] = useState({ lat: 39, lng: -95 });
 
   useEffect(() => {
     const q = query(collection(db, "markers"));
@@ -33,9 +33,9 @@ function App() {
     });
   }, []);
 
-  const onClick = async (e) => {
+  const onClick = (e) => {
     const { lat, lng } = e.latLng;
-    await addDoc(collection(db, "markers"), {
+    addDoc(collection(db, "markers"), {
       lat: lat(),
       lng: lng(),
     });
