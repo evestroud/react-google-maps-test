@@ -53,13 +53,12 @@ function App() {
   };
 
   const deleteMarkerFromDb = (marker) => {
-    if (marker.id === Cookies.get("my-dot")) {
-      Cookies.remove("my-dot");
+    if (marker.id !== Cookies.get("my-dot")) {
+      deleteDoc(doc(db, "markers", marker.id));
     }
-    deleteDoc(doc(db, "markers", marker.id));
   };
 
-  const getCurrentLocation = () => {
+  const toggleCurrentLocation = () => {
     if (!Cookies.get("my-dot")) {
       navigator.geolocation.getCurrentPosition((res) => {
         const [lat, lng] = [res.coords.latitude, res.coords.longitude];
@@ -67,6 +66,9 @@ function App() {
           Cookies.set("my-dot", result.id)
         );
       });
+    } else {
+      deleteDoc(doc(db, "markers", Cookies.get("my-dot")));
+      Cookies.remove("my-dot");
     }
   };
 
@@ -110,7 +112,7 @@ function App() {
         <h1>Loading...</h1>
       )}
       <div className="controls">
-        <button onClick={getCurrentLocation}>Get my location</button>
+        <button onClick={toggleCurrentLocation}>Toggle my location</button>
         <button onClick={zoomToFit}>Zoom to fit markers</button>
         <button onClick={resetMap}>Reset map view</button>
         <button onClick={deleteAllMarkers}>Clear markers</button>
