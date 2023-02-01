@@ -104,8 +104,8 @@ function App() {
           zoom={zoom}
           onLoad={(map) => (ref.current = map)}
         >
-          {markers.map(({ lat, lng }, i) => (
-            <MarkerF position={{ lat, lng }} key={i} onClick={onClickMarker} />
+          {markers.map(({ lat, lng, id }) => (
+            <MarkerF position={{ lat, lng }} key={id} onClick={onClickMarker} />
           ))}
         </GoogleMap>
       ) : (
