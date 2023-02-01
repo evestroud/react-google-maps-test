@@ -21,7 +21,7 @@ function App() {
   const [markers, setMarkers] = useState([]);
   const [center, setCenter] = useState({ lat: 39, lng: -95 });
   const [zoom, setZoom] = useState(4);
-  const [myDotActive, setMyDotActive] = useState(false);
+  const [myDot, setMyDot] = useState(Cookies.get('my-dot'));
   const ref = useRef(null);
 
   useEffect(() => {
@@ -65,13 +65,13 @@ function App() {
         const [lat, lng] = [res.coords.latitude, res.coords.longitude];
         addDoc(collection(db, "markers"), { lat, lng }).then((result) => {
           Cookies.set("my-dot", result.id);
-          setMyDotActive(true);
+          setMyDot(result.id);
         });
       });
     } else {
       deleteDoc(doc(db, "markers", Cookies.get("my-dot")));
       Cookies.remove("my-dot");
-      setMyDotActive(false);
+      setMyDot(undefined);
     }
   };
 
@@ -113,7 +113,7 @@ function App() {
               key={id}
               onClick={onClickMarker}
               icon={
-                myDotActive && Cookies.get("my-dot") === id
+                myDot === id
                   ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
                   : ""
               }
