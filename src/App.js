@@ -8,6 +8,7 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
+import Cookies from "js-cookie";
 import { db } from "./firebase";
 import "./App.css";
 
