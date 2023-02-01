@@ -1,4 +1,4 @@
-import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
+import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import { useEffect, useRef, useState } from "react";
 import {
   addDoc,
@@ -21,6 +21,7 @@ function App() {
   const [markers, setMarkers] = useState([]);
   const [center, setCenter] = useState({ lat: 39, lng: -95 });
   const [zoom, setZoom] = useState(4);
+  const [myDotActive, setMyDotActive] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
@@ -62,13 +63,15 @@ function App() {
     if (!Cookies.get("my-dot")) {
       navigator.geolocation.getCurrentPosition((res) => {
         const [lat, lng] = [res.coords.latitude, res.coords.longitude];
-        addDoc(collection(db, "markers"), { lat, lng }).then((result) =>
-          Cookies.set("my-dot", result.id)
-        );
+        addDoc(collection(db, "markers"), { lat, lng }).then((result) => {
+          Cookies.set("my-dot", result.id);
+          setMyDotActive(true);
+        });
       });
     } else {
       deleteDoc(doc(db, "markers", Cookies.get("my-dot")));
       Cookies.remove("my-dot");
+      setMyDotActive(false);
     }
   };
 
@@ -105,7 +108,16 @@ function App() {
           onLoad={(map) => (ref.current = map)}
         >
           {markers.map(({ lat, lng, id }) => (
-            <MarkerF position={{ lat, lng }} key={id} onClick={onClickMarker} />
+            <Marker
+              position={{ lat, lng }}
+              key={id}
+              onClick={onClickMarker}
+              icon={
+                myDotActive && Cookies.get("my-dot") === id
+                  ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                  : ""
+              }
+            />
           ))}
         </GoogleMap>
       ) : (
