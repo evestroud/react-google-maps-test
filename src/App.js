@@ -36,19 +36,9 @@ function App() {
   }, []);
 
   const onClick = (e) => {
-    const { lat, lng } = e.latLng;
-    addMarkerToDb(lat(), lng());
+    const [lat, lng] = [e.latLng.lat(), e.latLng.lng()];
+    addDoc(collection(db, "markers"), { lat, lng });
   };
-
-  function addMarkerToDb(lat, lng) {
-    const approxEquals = (x, y) => Math.abs(x - y) < 0.001;
-    // don't add a duplicate marker
-    if (
-      !markers.find((m) => approxEquals(m.lat, lat) && approxEquals(m.lng, lng))
-    ) {
-      addDoc(collection(db, "markers"), { lat, lng });
-    }
-  }
 
   const onClickMarker = (e) => {
     const [lat, lng] = [e.latLng.lat(), e.latLng.lng()];
@@ -62,15 +52,22 @@ function App() {
     }
   };
 
-  function deleteMarkerFromDb(marker) {
+  const deleteMarkerFromDb = (marker) => {
+    if (marker.id === Cookies.get("my-dot")) {
+      Cookies.remove("my-dot");
+    }
     deleteDoc(doc(db, "markers", marker.id));
-  }
+  };
 
   const getCurrentLocation = () => {
-    navigator.geolocation.getCurrentPosition((res) => {
-      const [lat, lng] = [res.coords.latitude, res.coords.longitude];
-      addMarkerToDb(lat, lng);
-    });
+    if (!Cookies.get("my-dot")) {
+      navigator.geolocation.getCurrentPosition((res) => {
+        const [lat, lng] = [res.coords.latitude, res.coords.longitude];
+        addDoc(collection(db, "markers"), { lat, lng }).then((result) =>
+          Cookies.set("my-dot", result.id)
+        );
+      });
+    }
   };
 
   const zoomToFit = () => {
