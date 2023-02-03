@@ -7,6 +7,8 @@ import {
   onSnapshot,
   deleteDoc,
   doc,
+  where,
+  updateDoc,
 } from "firebase/firestore";
 import Cookies from "js-cookie";
 import { db } from "./firebase";
@@ -38,9 +40,21 @@ function App() {
     });
   }, []);
 
+  useEffect(() => {
+    if (community) {
+      const q = doc(db, "communities", community);
+
+      const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
+        setMarkers(QuerySnapshot.data().markers);
+      });
+    }
+  }, [community]);
+
   const onClick = (e) => {
     const [lat, lng] = [e.latLng.lat(), e.latLng.lng()];
-    addDoc(collection(db, "markers"), { lat, lng });
+    updateDoc(doc(db, "communities", community), {
+      markers: [...markers, { lat, lng }],
+    });
   };
 
   const onClickMarker = (e) => {
@@ -56,9 +70,14 @@ function App() {
   };
 
   const deleteMarkerFromDb = (marker) => {
-    if (marker.id !== Cookies.get("my-dot")) {
-      deleteDoc(doc(db, "markers", marker.id));
-    }
+    // if (marker.id !== Cookies.get("my-dot")) {
+    //   deleteDoc(doc(db, "markers", marker.id));
+    // }
+    updateDoc(doc(db, "communities", community), {
+      markers: markers.filter((m) => {
+        return m !== marker;
+      }),
+    });
   };
 
   const toggleCurrentLocation = () => {
@@ -101,7 +120,9 @@ function App() {
         <select onClick={(e) => setCommunity(e.target.value)}>
           <option value="">Select community:</option>
           {communities.map((c) => (
-            <option value={c.id} key={c.id}>{c.name}</option>
+            <option value={c.id} key={c.id}>
+              {c.name}
+            </option>
           ))}
         </select>
       </header>
