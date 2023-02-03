@@ -42,19 +42,27 @@ function App() {
 
   useEffect(() => {
     if (community) {
-      const q = doc(db, "communities", community);
+      const q = query(collection(doc(db, "communities", community), "markers"));
 
       const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
-        setMarkers(QuerySnapshot.data().markers);
+        let markers = [];
+        QuerySnapshot.forEach((marker) => {
+          markers.push({ ...marker.data(), id: marker.id });
+        });
+        setMarkers(markers);
       });
     }
   }, [community]);
 
   const onClick = (e) => {
-    const [lat, lng] = [e.latLng.lat(), e.latLng.lng()];
-    updateDoc(doc(db, "communities", community), {
-      markers: [...markers, { lat, lng }],
-    });
+    if (community) {
+      const [lat, lng] = [e.latLng.lat(), e.latLng.lng()];
+      const communityMarkers = collection(
+        doc(db, "communities", community),
+        "markers"
+      );
+      addDoc(communityMarkers, { lat, lng });
+    }
   };
 
   const onClickMarker = (e) => {
@@ -70,14 +78,10 @@ function App() {
   };
 
   const deleteMarkerFromDb = (marker) => {
-    // if (marker.id !== Cookies.get("my-dot")) {
-    //   deleteDoc(doc(db, "markers", marker.id));
-    // }
-    updateDoc(doc(db, "communities", community), {
-      markers: markers.filter((m) => {
-        return m !== marker;
-      }),
-    });
+    if (marker.id !== Cookies.get("my-dot")) {
+      const communityMarkers = doc(db, "communities", community);
+      deleteDoc(doc(communityMarkers, "markers", marker.id));
+    }
   };
 
   const toggleCurrentLocation = () => {
