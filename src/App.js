@@ -23,7 +23,7 @@ function App() {
   const [markers, setMarkers] = useState([]);
   const [center, setCenter] = useState({ lat: 39, lng: -95 });
   const [zoom, setZoom] = useState(4);
-  const [myDot, setMyDot] = useState(Cookies.get("my-dot"));
+  const [myDot, setMyDot] = useState(Cookies.get(community));
   const ref = useRef(null);
 
   useEffect(() => {
@@ -78,7 +78,7 @@ function App() {
   };
 
   const deleteMarkerFromDb = (marker) => {
-    if (marker.id !== Cookies.get("my-dot")) {
+    if (marker.id !== Cookies.get(community)) {
       const communityMarkers = doc(db, "communities", community);
       deleteDoc(doc(communityMarkers, "markers", marker.id));
     }
@@ -87,19 +87,19 @@ function App() {
   const toggleCurrentLocation = () => {
     if (community) {
       const communityDoc = doc(db, "communities", community);
-      if (!Cookies.get("my-dot")) {
+      if (!Cookies.get(community)) {
         navigator.geolocation.getCurrentPosition((res) => {
           const [lat, lng] = [res.coords.latitude, res.coords.longitude];
           addDoc(collection(communityDoc, "markers"), { lat, lng }).then(
             (result) => {
-              Cookies.set("my-dot", result.id);
+              Cookies.set(community, result.id);
               setMyDot(result.id);
             }
           );
         });
       } else {
-        deleteDoc(doc(communityDoc, "markers", Cookies.get("my-dot")));
-        Cookies.remove("my-dot");
+        deleteDoc(doc(communityDoc, "markers", Cookies.get(community)));
+        Cookies.remove(community);
         setMyDot(undefined);
       }
     }
