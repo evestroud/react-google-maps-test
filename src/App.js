@@ -18,21 +18,23 @@ function App() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: MAPS_API_KEY,
   });
+  const [communities, setCommunities] = useState([]);
+  const [community, setCommunity] = useState("");
   const [markers, setMarkers] = useState([]);
   const [center, setCenter] = useState({ lat: 39, lng: -95 });
   const [zoom, setZoom] = useState(4);
-  const [myDot, setMyDot] = useState(Cookies.get('my-dot'));
+  const [myDot, setMyDot] = useState(Cookies.get("my-dot"));
   const ref = useRef(null);
 
   useEffect(() => {
-    const q = query(collection(db, "markers"));
+    const q = query(collection(db, "communities"));
 
     const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
-      let markers = [];
+      let communities = [];
       QuerySnapshot.forEach((doc) => {
-        markers.push({ ...doc.data(), id: doc.id });
+        communities.push({ ...doc.data(), id: doc.id });
       });
-      setMarkers(markers);
+      setCommunities(communities);
     });
   }, []);
 
@@ -95,6 +97,14 @@ function App() {
 
   return (
     <div className="App">
+      <header>
+        <select onClick={(e) => setCommunity(e.target.value)}>
+          <option value="">Select community:</option>
+          {communities.map((c) => (
+            <option value={c.id} key={c.id}>{c.name}</option>
+          ))}
+        </select>
+      </header>
       {isLoaded ? (
         <GoogleMap
           mapContainerClassName="map-container"
