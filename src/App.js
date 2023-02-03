@@ -7,8 +7,6 @@ import {
   onSnapshot,
   deleteDoc,
   doc,
-  where,
-  updateDoc,
 } from "firebase/firestore";
 import Cookies from "js-cookie";
 import { db } from "./firebase";
@@ -51,6 +49,8 @@ function App() {
         });
         setMarkers(markers);
       });
+    } else {
+      setMarkers([]);
     }
   }, [community]);
 
@@ -85,18 +85,23 @@ function App() {
   };
 
   const toggleCurrentLocation = () => {
-    if (!Cookies.get("my-dot")) {
-      navigator.geolocation.getCurrentPosition((res) => {
-        const [lat, lng] = [res.coords.latitude, res.coords.longitude];
-        addDoc(collection(db, "markers"), { lat, lng }).then((result) => {
-          Cookies.set("my-dot", result.id);
-          setMyDot(result.id);
+    if (community) {
+      const communityDoc = doc(db, "communities", community);
+      if (!Cookies.get("my-dot")) {
+        navigator.geolocation.getCurrentPosition((res) => {
+          const [lat, lng] = [res.coords.latitude, res.coords.longitude];
+          addDoc(collection(communityDoc, "markers"), { lat, lng }).then(
+            (result) => {
+              Cookies.set("my-dot", result.id);
+              setMyDot(result.id);
+            }
+          );
         });
-      });
-    } else {
-      deleteDoc(doc(db, "markers", Cookies.get("my-dot")));
-      Cookies.remove("my-dot");
-      setMyDot(undefined);
+      } else {
+        deleteDoc(doc(communityDoc, "markers", Cookies.get("my-dot")));
+        Cookies.remove("my-dot");
+        setMyDot(undefined);
+      }
     }
   };
 
