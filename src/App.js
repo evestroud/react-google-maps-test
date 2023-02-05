@@ -27,7 +27,7 @@ function App() {
   const ref = useRef(null);
 
   useEffect(() => {
-    const q = query(collection(db, "communities"));
+    const q = query(collection(db, "communities-secure"));
 
     const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
       let communities = [];
@@ -39,8 +39,11 @@ function App() {
   }, []);
 
   useEffect(() => {
+    setMyDot(Cookies.get(community));
     if (community) {
-      const q = query(collection(doc(db, "communities", community), "markers"));
+      const q = query(
+        collection(doc(db, "communities-secure", community), "markers")
+      );
 
       const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
         let markers = [];
@@ -58,7 +61,7 @@ function App() {
     if (community) {
       const [lat, lng] = [e.latLng.lat(), e.latLng.lng()];
       const communityMarkers = collection(
-        doc(db, "communities", community),
+        doc(db, "communities-secure", community),
         "markers"
       );
       addDoc(communityMarkers, { lat, lng });
@@ -79,14 +82,14 @@ function App() {
 
   const deleteMarkerFromDb = (marker) => {
     if (marker.id !== Cookies.get(community)) {
-      const communityMarkers = doc(db, "communities", community);
+      const communityMarkers = doc(db, "communities-secure", community);
       deleteDoc(doc(communityMarkers, "markers", marker.id));
     }
   };
 
   const toggleCurrentLocation = () => {
     if (community) {
-      const communityDoc = doc(db, "communities", community);
+      const communityDoc = doc(db, "communities-secure", community);
       if (!Cookies.get(community)) {
         navigator.geolocation.getCurrentPosition((res) => {
           const [lat, lng] = [res.coords.latitude, res.coords.longitude];
@@ -130,7 +133,7 @@ function App() {
           <option value="">Select community:</option>
           {communities.map((c) => (
             <option value={c.id} key={c.id}>
-              {c.name}
+              {c.id}
             </option>
           ))}
         </select>
