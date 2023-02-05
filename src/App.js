@@ -18,25 +18,12 @@ function App() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: MAPS_API_KEY,
   });
-  const [communities, setCommunities] = useState([]);
   const [community, setCommunity] = useState("");
   const [markers, setMarkers] = useState([]);
   const [center, setCenter] = useState({ lat: 39, lng: -95 });
   const [zoom, setZoom] = useState(4);
   const [myDot, setMyDot] = useState(Cookies.get(community));
   const ref = useRef(null);
-
-  useEffect(() => {
-    const q = query(collection(db, "communities-secure"));
-
-    const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
-      let communities = [];
-      QuerySnapshot.forEach((doc) => {
-        communities.push({ ...doc.data(), id: doc.id });
-      });
-      setCommunities(communities);
-    });
-  }, []);
 
   useEffect(() => {
     setMyDot(Cookies.get(community));
@@ -129,14 +116,8 @@ function App() {
   return (
     <div className="App">
       <header>
-        <select onClick={(e) => setCommunity(e.target.value)}>
-          <option value="">Select community:</option>
-          {communities.map((c) => (
-            <option value={c.id} key={c.id}>
-              {c.id}
-            </option>
-          ))}
-        </select>
+        <input type="text" placeholder="Enter community code" />
+        <button onClick="">Get this community</button>
       </header>
       {isLoaded ? (
         <GoogleMap
