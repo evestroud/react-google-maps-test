@@ -18,6 +18,7 @@ function App() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: MAPS_API_KEY,
   });
+  const [communityInput, setCommunityInput] = useState("");
   const [community, setCommunity] = useState("");
   const [markers, setMarkers] = useState([]);
   const [center, setCenter] = useState({ lat: 39, lng: -95 });
@@ -116,8 +117,15 @@ function App() {
   return (
     <div className="App">
       <header>
-        <input type="text" placeholder="Enter community code" />
-        <button onClick="">Get this community</button>
+        <input
+          type="text"
+          placeholder="Enter community code"
+          value={communityInput}
+          onChange={(e) => setCommunityInput(e.target.value)}
+        />
+        <button onClick={() => setCommunity(communityInput)}>
+          Get community
+        </button>
       </header>
       {isLoaded ? (
         <GoogleMap
