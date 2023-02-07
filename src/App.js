@@ -48,7 +48,7 @@ function App() {
   const createCommunity = () => {
     const communities = collection(db, "communities-secure");
     addDoc(communities, {}).then((result) => {
-      setCommunity(result.id)
+      setCommunity(result.id);
     });
   };
 
@@ -134,6 +134,11 @@ function App() {
           <button onClick={() => setCommunity(communityInput)}>
             Get community
           </button>
+        </div>
+        <div>
+          Selected community:
+          <br />
+          {community}
         </div>
         <button onClick={createCommunity}>Create new community</button>
       </header>
