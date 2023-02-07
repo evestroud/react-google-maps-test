@@ -8,6 +8,7 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
+import { getAuth, signInAnonymously } from "firebase/auth";
 import Cookies from "js-cookie";
 import { db } from "./firebase";
 import "./App.css";
@@ -18,6 +19,7 @@ function App() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: MAPS_API_KEY,
   });
+  const auth = getAuth();
   const [communityInput, setCommunityInput] = useState("");
   const [community, setCommunity] = useState("");
   const [markers, setMarkers] = useState([]);
@@ -30,7 +32,7 @@ function App() {
     setMyDot(Cookies.get(community));
     if (community) {
       const q = query(
-        collection(doc(db, "communities-secure", community), "markers")
+        collection(doc(db, "communities-auth", community), "markers")
       );
 
       const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
@@ -46,7 +48,7 @@ function App() {
   }, [community]);
 
   const createCommunity = () => {
-    const communities = collection(db, "communities-secure");
+    const communities = collection(db, "communities-auth");
     addDoc(communities, {}).then((result) => {
       setCommunity(result.id);
     });
@@ -56,7 +58,7 @@ function App() {
     if (community) {
       const [lat, lng] = [e.latLng.lat(), e.latLng.lng()];
       const communityMarkers = collection(
-        doc(db, "communities-secure", community),
+        doc(db, "communities-auth", community),
         "markers"
       );
       addDoc(communityMarkers, { lat, lng });
@@ -77,14 +79,14 @@ function App() {
 
   const deleteMarkerFromDb = (marker) => {
     if (marker.id !== Cookies.get(community)) {
-      const communityMarkers = doc(db, "communities-secure", community);
+      const communityMarkers = doc(db, "communities-auth", community);
       deleteDoc(doc(communityMarkers, "markers", marker.id));
     }
   };
 
   const toggleCurrentLocation = () => {
     if (community) {
-      const communityDoc = doc(db, "communities-secure", community);
+      const communityDoc = doc(db, "communities-auth", community);
       if (!Cookies.get(community)) {
         navigator.geolocation.getCurrentPosition((res) => {
           const [lat, lng] = [res.coords.latitude, res.coords.longitude];
