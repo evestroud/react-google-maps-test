@@ -10,7 +10,8 @@
   width: 100%;
 }
 
-.controls {
+.controls,
+header {
   flex: 1;
   margin: 1rem;
   display: flex;

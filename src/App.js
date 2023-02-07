@@ -117,15 +117,18 @@ function App() {
   return (
     <div className="App">
       <header>
-        <input
-          type="text"
-          placeholder="Enter community code"
-          value={communityInput}
-          onChange={(e) => setCommunityInput(e.target.value)}
-        />
-        <button onClick={() => setCommunity(communityInput)}>
-          Get community
-        </button>
+        <div>
+          <input
+            type="text"
+            placeholder="Enter community code"
+            value={communityInput}
+            onChange={(e) => setCommunityInput(e.target.value)}
+          />
+          <button onClick={() => setCommunity(communityInput)}>
+            Get community
+          </button>
+        </div>
+        <button>Create new community</button>
       </header>
       {isLoaded ? (
         <GoogleMap
