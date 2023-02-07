@@ -8,9 +8,9 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { getAuth, signInAnonymously } from "firebase/auth";
+import { signInAnonymously, signOut } from "firebase/auth";
 import Cookies from "js-cookie";
-import { db } from "./firebase";
+import { db, auth } from "./firebase";
 import "./App.css";
 
 const MAPS_API_KEY = `${process.env.REACT_APP_MAPS_API_KEY}`;
@@ -19,7 +19,6 @@ function App() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: MAPS_API_KEY,
   });
-  const auth = getAuth();
   const [communityInput, setCommunityInput] = useState("");
   const [community, setCommunity] = useState("");
   const [markers, setMarkers] = useState([]);
