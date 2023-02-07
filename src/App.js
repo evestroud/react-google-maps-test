@@ -45,6 +45,13 @@ function App() {
     }
   }, [community]);
 
+  const createCommunity = () => {
+    const communities = collection(db, "communities-secure");
+    addDoc(communities, {}).then((result) => {
+      setCommunity(result.id)
+    });
+  };
+
   const onClick = (e) => {
     if (community) {
       const [lat, lng] = [e.latLng.lat(), e.latLng.lng()];
@@ -128,7 +135,7 @@ function App() {
             Get community
           </button>
         </div>
-        <button>Create new community</button>
+        <button onClick={createCommunity}>Create new community</button>
       </header>
       {isLoaded ? (
         <GoogleMap
