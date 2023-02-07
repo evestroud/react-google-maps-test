@@ -86,20 +86,24 @@ function App() {
   const toggleCurrentLocation = () => {
     if (community) {
       const communityDoc = doc(db, "communities-auth", community);
-      if (!Cookies.get(community)) {
+      if (!auth.config.currentUser) {
         navigator.geolocation.getCurrentPosition((res) => {
-          const [lat, lng] = [res.coords.latitude, res.coords.longitude];
-          addDoc(collection(communityDoc, "markers"), { lat, lng }).then(
-            (result) => {
-              Cookies.set(community, result.id);
-              setMyDot(result.id);
-            }
-          );
+          signInAnonymously(auth).then((loginResult) => {
+            const [lat, lng] = [res.coords.latitude, res.coords.longitude];
+            const uid = loginResult.user.uid;
+            addDoc(collection(communityDoc, "markers"), { lat, lng, uid }).then(
+              (result) => {
+                Cookies.set(community, result.id);
+                setMyDot(result.id);
+              }
+            );
+          });
         });
       } else {
         deleteDoc(doc(communityDoc, "markers", Cookies.get(community)));
         Cookies.remove(community);
         setMyDot(undefined);
+        signOut(auth);
       }
     }
   };
