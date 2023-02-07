@@ -9,7 +9,6 @@ import {
   doc,
 } from "firebase/firestore";
 import { signInAnonymously, signOut } from "firebase/auth";
-import Cookies from "js-cookie";
 import { db, auth } from "./firebase";
 import "./App.css";
 
@@ -24,11 +23,10 @@ function App() {
   const [markers, setMarkers] = useState([]);
   const [center, setCenter] = useState({ lat: 39, lng: -95 });
   const [zoom, setZoom] = useState(4);
-  const [myDot, setMyDot] = useState(Cookies.get(community));
   const ref = useRef(null);
+  const [myDot, setMyDot] = useState(undefined);
 
   useEffect(() => {
-    setMyDot(Cookies.get(community));
     if (community) {
       const q = query(
         collection(doc(db, "communities-auth", community), "markers")
@@ -40,6 +38,7 @@ function App() {
           markers.push({ ...marker.data(), id: marker.id });
         });
         setMarkers(markers);
+        setMyDot(markers.find((m) => m.uid === auth.currentUser.uid));
       });
     } else {
       setMarkers([]);
@@ -77,33 +76,29 @@ function App() {
   };
 
   const deleteMarkerFromDb = (marker) => {
-    if (marker.id !== Cookies.get(community)) {
-      const communityMarkers = doc(db, "communities-auth", community);
-      deleteDoc(doc(communityMarkers, "markers", marker.id));
-    }
+    const communityMarkers = doc(db, "communities-auth", community);
+    deleteDoc(doc(communityMarkers, "markers", marker.id));
   };
 
   const toggleCurrentLocation = () => {
     if (community) {
       const communityDoc = doc(db, "communities-auth", community);
-      if (!auth.config.currentUser) {
-        navigator.geolocation.getCurrentPosition((res) => {
-          signInAnonymously(auth).then((loginResult) => {
+      if (!auth.currentUser) {
+        signInAnonymously(auth).then((loginResult) => {
+          navigator.geolocation.getCurrentPosition((res) => {
             const [lat, lng] = [res.coords.latitude, res.coords.longitude];
             const uid = loginResult.user.uid;
-            addDoc(collection(communityDoc, "markers"), { lat, lng, uid }).then(
-              (result) => {
-                Cookies.set(community, result.id);
-                setMyDot(result.id);
-              }
-            );
+            addDoc(collection(communityDoc, "markers"), { lat, lng, uid });
           });
         });
+      } else if (myDot) {
+        deleteMarkerFromDb(myDot);
       } else {
-        deleteDoc(doc(communityDoc, "markers", Cookies.get(community)));
-        Cookies.remove(community);
-        setMyDot(undefined);
-        signOut(auth);
+        navigator.geolocation.getCurrentPosition((res) => {
+          const [lat, lng] = [res.coords.latitude, res.coords.longitude];
+          const uid = auth.currentUser.uid;
+          addDoc(collection(communityDoc, "markers"), { lat, lng, uid });
+        });
       }
     }
   };
@@ -159,13 +154,13 @@ function App() {
           zoom={zoom}
           onLoad={(map) => (ref.current = map)}
         >
-          {markers.map(({ lat, lng, id }) => (
+          {markers.map(({ lat, lng, id, uid }) => (
             <Marker
               position={{ lat, lng }}
               key={id}
               onClick={onClickMarker}
               icon={
-                myDot === id
+                id === myDot?.id
                   ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
                   : ""
               }
