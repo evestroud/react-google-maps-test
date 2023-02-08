@@ -8,7 +8,7 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { signInAnonymously, signOut } from "firebase/auth";
+import { signInAnonymously } from "firebase/auth";
 import { db, auth } from "./firebase";
 import "./App.css";
 
@@ -154,7 +154,7 @@ function App() {
           zoom={zoom}
           onLoad={(map) => (ref.current = map)}
         >
-          {markers.map(({ lat, lng, id, uid }) => (
+          {markers.map(({ lat, lng, id }) => (
             <Marker
               position={{ lat, lng }}
               key={id}
